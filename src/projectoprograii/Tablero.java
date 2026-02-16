@@ -30,45 +30,6 @@ public class Tablero {
 
     private static final Map<String, ImageIcon[]> cacheImagenes = new HashMap<>();
 
-
-    private static final Map<String, String> IMAGEN_POR_TIPO = new HashMap<>();
-    static {
-        IMAGEN_POR_TIPO.put("DT", "DES");
-        IMAGEN_POR_TIPO.put("SM", "SUB");
-        IMAGEN_POR_TIPO.put("AZ", "ACO");
-        IMAGEN_POR_TIPO.put("PA", "POR");
-    }
-
-    public static class Barco {
-        String tipo;
-        String id;
-        int vidaRestante;
-        int vidaInicial;
-        ArrayList<Point> posiciones;
-        boolean horizontal;
-
-        public Barco(String tipo, String id, int vidas, boolean horizontal) {
-            this.tipo         = tipo;
-            this.id           = id;
-            this.vidaRestante = vidas;
-            this.vidaInicial  = vidas;
-            this.posiciones   = new ArrayList<>();
-            this.horizontal   = horizontal;
-        }
-
-        public boolean hundidos() { return vidaRestante <= 0; }
-
-        public String getNombre() {
-            switch (tipo) {
-                case "PA": return "Portaaviones";
-                case "AZ": return "Acorazado";
-                case "SM": return "Submarino";
-                case "DT": return "Destructor";
-                default:   return "Barco";
-            }
-        }
-    }
-
     public Tablero(int x, int y, String nombreJugador) {
         this.nombreJugador    = nombreJugador;
         this.listaBarcosEnUso = new ArrayList<>();
@@ -104,7 +65,6 @@ public class Tablero {
                 btn.setFocusPainted(false);
                 btn.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
                 btn.setFont(new Font("Arial", Font.BOLD, 10));
-               
                 btn.setMargin(new Insets(0, 0, 0, 0));
                 botones[f][c] = btn;
                 panel.add(btn);
@@ -112,12 +72,10 @@ public class Tablero {
         }
     }
 
-
-    private ImageIcon[] cargarSegmentos(String tipo, int tamanio, boolean horizontal) {
-        String nombreArchivo = IMAGEN_POR_TIPO.get(tipo);
+    private ImageIcon[] cargarSegmentos(Tipobarco tipo, int tamanio, boolean horizontal) {
+        String nombreArchivo = tipo.getImagenBase();
         if (nombreArchivo == null) return null;
 
-  
         String clave = nombreArchivo + (horizontal ? "_H" : "_V");
         if (cacheImagenes.containsKey(clave)) {
             return cacheImagenes.get(clave);
@@ -130,8 +88,6 @@ public class Tablero {
             ImageIcon iconOriginal = new ImageIcon(url);
             Image imgOriginal = iconOriginal.getImage();
 
-        
-   
             int anchoFinal = tamanio * TAMANIO_CELDA;
             int altoFinal  = TAMANIO_CELDA;
 
@@ -144,14 +100,12 @@ public class Tablero {
             ImageIcon[] segmentos;
 
             if (horizontal) {
-  
                 segmentos = new ImageIcon[tamanio];
                 for (int i = 0; i < tamanio; i++) {
-                    BufferedImage segmento = imgHoriz.getSubimage(i * TAMANIO_CELDA, 0, TAMANIO_CELDA, TAMANIO_CELDA);
-                    segmentos[i] = new ImageIcon(segmento);
+                    BufferedImage seg = imgHoriz.getSubimage(i * TAMANIO_CELDA, 0, TAMANIO_CELDA, TAMANIO_CELDA);
+                    segmentos[i] = new ImageIcon(seg);
                 }
             } else {
- 
                 BufferedImage imgVert = new BufferedImage(altoFinal, anchoFinal, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D gv = imgVert.createGraphics();
                 gv.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -160,11 +114,10 @@ public class Tablero {
                 gv.drawImage(imgHoriz, 0, 0, null);
                 gv.dispose();
 
-       
                 segmentos = new ImageIcon[tamanio];
                 for (int i = 0; i < tamanio; i++) {
-                    BufferedImage segmento = imgVert.getSubimage(0, i * TAMANIO_CELDA, TAMANIO_CELDA, TAMANIO_CELDA);
-                    segmentos[i] = new ImageIcon(segmento);
+                    BufferedImage seg = imgVert.getSubimage(0, i * TAMANIO_CELDA, TAMANIO_CELDA, TAMANIO_CELDA);
+                    segmentos[i] = new ImageIcon(seg);
                 }
             }
 
@@ -179,51 +132,45 @@ public class Tablero {
     private void actualizarColorCelda(int f, int c) {
         String celda = tablero[f][c];
 
-
         botones[f][c].setIcon(null);
         botones[f][c].setHorizontalAlignment(SwingConstants.CENTER);
 
         if (celda == null) {
             botones[f][c].setBackground(colorAgua);
             botones[f][c].setText("");
-        } else if (celda.equals("T")) {
-            botones[f][c].setBackground(new Color(255, 165, 0));
-            botones[f][c].setText("");
         } else if (celda.equals("X")) {
-            botones[f][c].setBackground(Color.RED);
-            botones[f][c].setText("");
-        } else if (celda.equals("F")) {
-            botones[f][c].setBackground(Color.GRAY);
-            botones[f][c].setText("");
+            botones[f][c].setBackground(new Color(100, 100, 100));
+            botones[f][c].setForeground(Color.BLACK);
+            botones[f][c].setFont(new Font("Arial", Font.BOLD, 24));
+            botones[f][c].setText("X");
         } else {
-            String tipo = extraerTipo(celda);
+            String tipoCodigo = extraerTipo(celda);
             if (modoOculto) {
                 botones[f][c].setBackground(colorAgua);
                 botones[f][c].setText("");
             } else {
-
                 Barco barco = buscarBarcoPorId(celda);
                 if (barco != null) {
-                    ImageIcon[] segs = cargarSegmentos(tipo, barco.vidaInicial, barco.horizontal);
+                    ImageIcon[] segs = cargarSegmentos(barco.getTipoBarco(), barco.getVidaInicial(), barco.isHorizontal());
                     if (segs != null) {
-                        int segIdx = barco.horizontal
-                            ? c - barco.posiciones.get(0).y
-                            : f - barco.posiciones.get(0).x;
+                        int segIdx = barco.isHorizontal()
+                            ? c - barco.getPosiciones().get(0).y
+                            : f - barco.getPosiciones().get(0).x;
                         if (segIdx >= 0 && segIdx < segs.length) {
                             botones[f][c].setBackground(colorAgua);
                             botones[f][c].setText("");
                             botones[f][c].setIcon(segs[segIdx]);
                         } else {
                             botones[f][c].setBackground(Color.DARK_GRAY);
-                            botones[f][c].setText(tipo);
+                            botones[f][c].setText(tipoCodigo);
                         }
                     } else {
                         botones[f][c].setBackground(Color.DARK_GRAY);
-                        botones[f][c].setText(tipo);
+                        botones[f][c].setText(tipoCodigo);
                     }
                 } else {
                     botones[f][c].setBackground(Color.DARK_GRAY);
-                    botones[f][c].setText(tipo);
+                    botones[f][c].setText(tipoCodigo);
                 }
             }
         }
@@ -231,12 +178,14 @@ public class Tablero {
         botones[f][c].setBorder(BorderFactory.createLineBorder(colorBordeActual, 2));
     }
 
-
     private Barco buscarBarcoPorId(String id) {
-        for (Barco b : listaBarcosEnUso) {
-            if (b.id.equals(id)) return b;
-        }
-        return null;
+        return buscarBarcoRecursivo(id, 0);
+    }
+
+    private Barco buscarBarcoRecursivo(String id, int index) {
+        if (index >= listaBarcosEnUso.size()) return null;
+        if (listaBarcosEnUso.get(index).getId().equals(id)) return listaBarcosEnUso.get(index);
+        return buscarBarcoRecursivo(id, index + 1);
     }
 
     private String extraerTipo(String id) {
@@ -260,9 +209,9 @@ public class Tablero {
         return true;
     }
 
-    public void colocarBarco(int f, int c, int tamanio, boolean horizontal, String tipo) {
-        String idUnico = tipo + contadorIds;
-        contadorIds++;
+    public void colocarBarco(int f, int c, int tamanio, boolean horizontal, String tipoStr) {
+        Tipobarco tipo    = Tipobarco.desdeCodigo(tipoStr);
+        String    idUnico = tipo.getCodigo() + contadorIds++;
 
         Barco nuevoBarco = new Barco(tipo, idUnico, tamanio, horizontal);
 
@@ -270,7 +219,7 @@ public class Tablero {
             int nf = horizontal ? f     : f + i;
             int nc = horizontal ? c + i : c;
             tablero[nf][nc] = idUnico;
-            nuevoBarco.posiciones.add(new Point(nf, nc));
+            nuevoBarco.agregarPosicion(new Point(nf, nc));
         }
 
         listaBarcosEnUso.add(nuevoBarco);
@@ -285,17 +234,16 @@ public class Tablero {
     public int atacar(int f, int c) {
         String celda = tablero[f][c];
 
-        if (celda == null || celda.equals("F")) {
-            tablero[f][c] = "F";
+        if (celda == null) {
+            tablero[f][c] = "X";
             actualizarColorCelda(f, c);
             return 0;
-        } else if (celda.equals("X") || celda.equals("T")) {
+        } else if (celda.equals("X")) {
             return 0;
         } else {
             for (Barco barco : listaBarcosEnUso) {
-                if (barco.id.equals(celda) && !barco.hundidos()) {
-                    barco.vidaRestante--;
-
+                if (barco.getId().equals(celda) && !barco.hundidos()) {
+                    barco.reducirVida();
                     if (barco.hundidos()) {
                         liberarPosicionesBarcoHundido(barco);
                         return 2;
@@ -311,7 +259,7 @@ public class Tablero {
     }
 
     private void liberarPosicionesBarcoHundido(Barco barco) {
-        for (Point pos : barco.posiciones) {
+        for (Point pos : barco.getPosiciones()) {
             tablero[pos.x][pos.y] = null;
             botones[pos.x][pos.y].setEnabled(true);
             botones[pos.x][pos.y].setIcon(null);
@@ -323,32 +271,33 @@ public class Tablero {
     }
 
     public void regenerarTablero() {
-        ArrayList<Barco> barcosParaRegenerar = new ArrayList<>();
+        ArrayList<Barco> barcosVivos = new ArrayList<>();
         for (Barco barco : listaBarcosEnUso)
-            if (!barco.hundidos()) barcosParaRegenerar.add(barco);
+            if (!barco.hundidos()) barcosVivos.add(barco);
 
         for (int f = 0; f < TAMANIO; f++)
             for (int c = 0; c < TAMANIO; c++)
-                if (tablero[f][c] != null) tablero[f][c] = null;
+                if (tablero[f][c] != null && !tablero[f][c].equals("X"))
+                    tablero[f][c] = null;
 
-        for (Barco barco : barcosParaRegenerar) {
+        for (Barco barco : barcosVivos) {
             boolean colocado = false;
-            int intentos     = 0;
-            int tam          = barco.vidaInicial;
+            int intentos = 0;
+            int tam = barco.getVidaInicial();
 
             while (!colocado && intentos < 200) {
-                int     nf   = random.nextInt(TAMANIO);
-                int     nc   = random.nextInt(TAMANIO);
+                int     nf    = random.nextInt(TAMANIO);
+                int     nc    = random.nextInt(TAMANIO);
                 boolean horiz = random.nextBoolean();
 
                 if (puedeColocar(nf, nc, tam, horiz)) {
-                    barco.posiciones.clear();
-                    barco.horizontal = horiz;
+                    barco.limpiarPosiciones();
+                    barco.setHorizontal(horiz);
                     for (int i = 0; i < tam; i++) {
                         int rf = horiz ? nf     : nf + i;
                         int rc = horiz ? nc + i : nc;
-                        tablero[rf][rc] = barco.id;
-                        barco.posiciones.add(new Point(rf, rc));
+                        tablero[rf][rc] = barco.getId();
+                        barco.agregarPosicion(new Point(rf, rc));
                     }
                     colocado = true;
                 }
@@ -364,15 +313,13 @@ public class Tablero {
         return false;
     }
 
-    public void limpiarFallos() {
-        for (int f = 0; f < TAMANIO; f++) {
-            for (int c = 0; c < TAMANIO; c++) {
-                if ("F".equals(tablero[f][c])) {
+    public void limpiarMarcas() {
+        for (int f = 0; f < TAMANIO; f++)
+            for (int c = 0; c < TAMANIO; c++)
+                if ("X".equals(tablero[f][c])) {
                     tablero[f][c] = null;
                     actualizarColorCelda(f, c);
                 }
-            }
-        }
     }
 
     public boolean todosHundidos() {
@@ -381,19 +328,13 @@ public class Tablero {
     }
 
     public int getBarcosRestantes() {
-        int count = 0;
-        for (Barco b : listaBarcosEnUso) if (!b.hundidos()) count++;
-        return count;
+        return contarVivosRecursivo(0);
     }
 
-    public void resaltarColocacion(int f, int c, int tamanio, boolean horizontal, boolean valido) {
-        Color color = valido ? new Color(46, 204, 110, 100) : new Color(220, 76, 60, 100);
-        for (int i = 0; i < tamanio; i++) {
-            int nf = horizontal ? f     : f + i;
-            int nc = horizontal ? c + i : c;
-            if (nf < TAMANIO && nc < TAMANIO && nf >= 0 && nc >= 0)
-                botones[nf][nc].setBackground(color);
-        }
+    private int contarVivosRecursivo(int index) {
+        if (index >= listaBarcosEnUso.size()) return 0;
+        int resto = contarVivosRecursivo(index + 1);
+        return listaBarcosEnUso.get(index).hundidos() ? resto : resto + 1;
     }
 
     public void setColorBordeTablero(Color color) {
@@ -409,17 +350,11 @@ public class Tablero {
     }
 
     public void resetColorBordeTablero() { setColorBordeTablero(Color.WHITE); }
-
-    public JPanel  getPanel()             { return panel; }
-    public JButton getBoton(int f, int c) { return botones[f][c]; }
+    public JPanel  getPanel()            { return panel; }
+    public JButton getBoton(int f, int c){ return botones[f][c]; }
 
     public void setModoOculto(boolean oculto) {
         this.modoOculto = oculto;
         actualizarTableroCompleto();
     }
-
-    public boolean getModoOculto()          { return modoOculto; }
-    public void    actualizarInfo(String t) { labelInfo.setText(t); }
-    public String  getNombreJugador()       { return nombreJugador; }
-    public ArrayList<Barco> getListaBarcos(){ return listaBarcosEnUso; }
 }

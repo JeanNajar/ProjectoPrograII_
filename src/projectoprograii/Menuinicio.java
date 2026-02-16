@@ -6,78 +6,67 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.net.URL;
 
-
 public class Menuinicio extends JFrame {
 
-    
     private class PanelConFondo extends JPanel {
-    private Image imagen;
+        private Image imagen;
 
-    public PanelConFondo(LayoutManager layout, String nombreArchivo) {
-        super(layout);
-        try {
-            URL url = getClass().getResource("/imagen/" + nombreArchivo);
-            if (url != null) {
-                imagen = new ImageIcon(url).getImage();
-            }
-        } catch (Exception e) {}
-    }
+        public PanelConFondo(LayoutManager layout, String nombreArchivo) {
+            super(layout);
+            try {
+                URL url = getClass().getResource("/imagen/" + nombreArchivo);
+                if (url != null) imagen = new ImageIcon(url).getImage();
+            } catch (Exception e) {}
+        }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (imagen != null) {
-            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (imagen != null) g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
         }
     }
-}
-    
-    
+
     private static ArrayList<Player> jugadores = new ArrayList<>();
 
-    private String dificultad = "NORMAL";
-    private String modoJuego = "TUTORIAL";
+    private String dificultad   = "NORMAL";
+    private String modoJuego    = "TUTORIAL";
     private Player jugadorActual = null;
 
-    private JPanel panelPrincipal;
+    private JPanel     panelPrincipal;
     private CardLayout cardLayout;
 
     static {
-        
         jugadores.add(new Player("admin", "admin"));
-     
     }
 
     public Menuinicio() {
         setTitle("Battleship - Menu Principal");
-        setSize(600, 550);
+        setSize(1500, 850);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
 
-        cardLayout = new CardLayout();
+        cardLayout     = new CardLayout();
         panelPrincipal = new JPanel(cardLayout);
 
-        panelPrincipal.add(crearPantallaInicio(),        "INICIO");
-        panelPrincipal.add(crearPantallaLogin(),         "LOGIN");
-        panelPrincipal.add(crearPantallaRegistro(),      "REGISTRO");
+        panelPrincipal.add(crearPantallaInicio(),   "INICIO");
+        panelPrincipal.add(crearPantallaLogin(), "LOGIN");
+        panelPrincipal.add(crearPantallaRegistro(),  "REGISTRO");
         panelPrincipal.add(crearPantallaMenuPrincipal(), "MENU");
         panelPrincipal.add(crearPantallaConfiguracion(), "CONFIG");
-        panelPrincipal.add(crearPantallaReportes(),      "REPORTES");
-        panelPrincipal.add(crearPantallaPerfil(),        "PERFIL");
+        panelPrincipal.add(crearPantallaReportes(), "REPORTES");
+        panelPrincipal.add(crearPantallaPerfil(),    "PERFIL");
 
         add(panelPrincipal);
         cardLayout.show(panelPrincipal, "INICIO");
     }
 
-   
     private JPanel crearPantallaInicio() {
-      JPanel panel = new PanelConFondo(new GridBagLayout(), "menu_background.png");
-       panel.setOpaque(true);
+        JPanel panel = new PanelConFondo(new GridBagLayout(), "menu_background.png");
+        panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-       
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
         JButton btnLogin = crearBoton("Login", new Color(52, 152, 219));
         btnLogin.setForeground(Color.BLACK);
@@ -100,13 +89,12 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-
     private JPanel crearPantallaLogin() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("LOGIN");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -147,9 +135,6 @@ public class Menuinicio extends JFrame {
                 lblMensaje.setText("");
                 txtUser.setText("");
                 txtPass.setText("");
-
-                panelPrincipal.remove(panelPrincipal.getComponentCount() - 1);
-                panelPrincipal.add(crearPantallaPerfil(), "PERFIL");
                 cardLayout.show(panelPrincipal, "MENU");
             } else {
                 lblMensaje.setText("Usuario o contrasena incorrectos");
@@ -167,13 +152,12 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-    
     private JPanel crearPantallaRegistro() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("CREAR CUENTA");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -248,20 +232,17 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-
-
-
     private JPanel crearPantallaMenuPrincipal() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.gridx  = 0;
 
-        JLabel titulo = new JLabel("MENU PRINCIPAL");
+        JLabel titulo = new JLabel("  MENU PRINCIPAL");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
-        titulo.setForeground(Color.WHITE);
+        titulo.setForeground(Color.BLACK);
         gbc.gridy = 0;
         panel.add(titulo, gbc);
 
@@ -277,28 +258,15 @@ public class Menuinicio extends JFrame {
         gbc.gridy = 2;
         panel.add(btnConfig, gbc);
 
-     
         JButton btnReportes = crearBoton("Reportes", new Color(230, 126, 34));
         btnReportes.setForeground(Color.BLACK);
-        btnReportes.addActionListener(e -> {
-        
-            int idx = indexOfCard("REPORTES");
-            if (idx >= 0) panelPrincipal.remove(idx);
-            panelPrincipal.add(crearPantallaReportes(), "REPORTES");
-            cardLayout.show(panelPrincipal, "REPORTES");
-        });
+        btnReportes.addActionListener(e -> cardLayout.show(panelPrincipal, "REPORTES"));
         gbc.gridy = 3;
         panel.add(btnReportes, gbc);
 
-  
         JButton btnPerfil = crearBoton("Mi Perfil", new Color(155, 89, 182));
         btnPerfil.setForeground(Color.BLACK);
-        btnPerfil.addActionListener(e -> {
-            int idx = indexOfCard("PERFIL");
-            if (idx >= 0) panelPrincipal.remove(idx);
-            panelPrincipal.add(crearPantallaPerfil(), "PERFIL");
-            cardLayout.show(panelPrincipal, "PERFIL");
-        });
+        btnPerfil.addActionListener(e -> cardLayout.show(panelPrincipal, "PERFIL"));
         gbc.gridy = 4;
         panel.add(btnPerfil, gbc);
 
@@ -314,13 +282,12 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-
     private JPanel crearPantallaConfiguracion() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
         JLabel titulo = new JLabel("CONFIGURACION");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -361,14 +328,13 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-
     private JPanel crearPantallaReportes() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 10, 8, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.gridx  = 0;
 
         JLabel titulo = new JLabel("REPORTES");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -376,14 +342,12 @@ public class Menuinicio extends JFrame {
         gbc.gridy = 0;
         panel.add(titulo, gbc);
 
-        // boton reporte
         JButton btnUltimos = crearBoton("Mis ultimos 10 juegos", new Color(52, 152, 219));
         btnUltimos.setForeground(Color.BLACK);
         btnUltimos.addActionListener(e -> mostrarUltimos10Juegos());
         gbc.gridy = 1;
         panel.add(btnUltimos, gbc);
 
-        // boton ranking
         JButton btnRanking = crearBoton("Ranking de jugadores", new Color(230, 126, 34));
         btnRanking.setForeground(Color.BLACK);
         btnRanking.addActionListener(e -> mostrarRanking());
@@ -399,7 +363,6 @@ public class Menuinicio extends JFrame {
         return panel;
     }
 
-
     private void mostrarUltimos10Juegos() {
         if (jugadorActual == null) return;
 
@@ -412,11 +375,10 @@ public class Menuinicio extends JFrame {
         lbl.setFont(new Font("Arial", Font.BOLD, 14));
         panelLogs.add(lbl);
 
- 
         int numero = 1;
         for (String log : logs) {
             String texto = numero + "- " + (log != null ? log : "");
-            JLabel fila = new JLabel(texto);
+            JLabel fila  = new JLabel(texto);
             fila.setForeground(Color.WHITE);
             fila.setFont(new Font("Arial", Font.PLAIN, 12));
             panelLogs.add(fila);
@@ -426,11 +388,8 @@ public class Menuinicio extends JFrame {
         JOptionPane.showMessageDialog(this, panelLogs, "Mis Ultimos 10 Juegos", JOptionPane.PLAIN_MESSAGE);
     }
 
-
     private void mostrarRanking() {
-   
         ArrayList<Player> ordenados = new ArrayList<>(jugadores);
-
 
         for (int i = 0; i < ordenados.size() - 1; i++) {
             for (int j = 0; j < ordenados.size() - 1 - i; j++) {
@@ -453,7 +412,7 @@ public class Menuinicio extends JFrame {
         int pos = 1;
         for (Player p : ordenados) {
             String linea = String.format("  %d | %-20s | %d", pos, p.getUsername(), p.getPuntos());
-            JLabel fila = new JLabel(linea);
+            JLabel fila  = new JLabel(linea);
             fila.setForeground(pos == 1 ? Color.YELLOW : Color.WHITE);
             fila.setFont(new Font("Monospaced", Font.PLAIN, 13));
             panelRanking.add(fila);
@@ -463,14 +422,13 @@ public class Menuinicio extends JFrame {
         JOptionPane.showMessageDialog(this, panelRanking, "Ranking de Jugadores", JOptionPane.PLAIN_MESSAGE);
     }
 
- 
     private JPanel crearPantallaPerfil() {
         JPanel panel = new PanelConFondo(new GridBagLayout(), "menus_background.png");
         panel.setOpaque(true);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 10, 8, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.gridx  = 0;
 
         JLabel titulo = new JLabel("MI PERFIL");
         titulo.setFont(new Font("Arial", Font.BOLD, 24));
@@ -478,21 +436,18 @@ public class Menuinicio extends JFrame {
         gbc.gridy = 0;
         panel.add(titulo, gbc);
 
-        // ver datos
         JButton btnVer = crearBoton("Ver mis datos", new Color(52, 152, 219));
         btnVer.setForeground(Color.BLACK);
         btnVer.addActionListener(e -> verDatos());
         gbc.gridy = 1;
         panel.add(btnVer, gbc);
 
-        // modificar datos
         JButton btnModificar = crearBoton("Modificar mis datos", new Color(46, 204, 113));
         btnModificar.setForeground(Color.BLACK);
         btnModificar.addActionListener(e -> modificarDatos());
         gbc.gridy = 2;
         panel.add(btnModificar, gbc);
 
-        // eliminar cuenta
         JButton btnEliminar = crearBoton("Eliminar mi cuenta", new Color(231, 76, 60));
         btnEliminar.setForeground(Color.BLACK);
         btnEliminar.addActionListener(e -> eliminarCuenta());
@@ -514,9 +469,9 @@ public class Menuinicio extends JFrame {
         JPanel p = new JPanel(new GridLayout(3, 1, 5, 5));
         p.setBackground(new Color(44, 62, 80));
 
-        JLabel u = new JLabel("Username: " + jugadorActual.getUsername());
-        JLabel pw = new JLabel("Password: " + jugadorActual.getPassword());
-        JLabel pts = new JLabel("Puntos: " + jugadorActual.getPuntos());
+        JLabel u   = new JLabel("Username: " + jugadorActual.getUsername());
+        JLabel pw  = new JLabel("Password: " + jugadorActual.getPassword());
+        JLabel pts = new JLabel("Puntos: "   + jugadorActual.getPuntos());
 
         for (JLabel lbl : new JLabel[]{u, pw, pts}) {
             lbl.setForeground(Color.WHITE);
@@ -538,8 +493,8 @@ public class Menuinicio extends JFrame {
         JLabel lc = new JLabel("Confirmar password:");
         lu.setForeground(Color.WHITE); lp.setForeground(Color.WHITE); lc.setForeground(Color.WHITE);
 
-        JTextField txtUser = new JTextField(jugadorActual.getUsername());
-        JPasswordField txtPass = new JPasswordField();
+        JTextField    txtUser    = new JTextField(jugadorActual.getUsername());
+        JPasswordField txtPass   = new JPasswordField();
         JPasswordField txtConfirm = new JPasswordField();
         JLabel lblError = new JLabel("");
         lblError.setForeground(new Color(231, 76, 60));
@@ -549,7 +504,8 @@ public class Menuinicio extends JFrame {
         p.add(lc); p.add(txtConfirm);
         p.add(new JLabel("")); p.add(lblError);
 
-        int opcion = JOptionPane.showConfirmDialog(this, p, "Modificar Datos", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int opcion = JOptionPane.showConfirmDialog(this, p, "Modificar Datos",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (opcion == JOptionPane.OK_OPTION) {
             String nuevoUser = txtUser.getText().trim();
@@ -558,7 +514,6 @@ public class Menuinicio extends JFrame {
 
             if (nuevoUser.isEmpty()) return;
 
-       
             boolean userOcupado = false;
             for (Player p2 : jugadores) {
                 if (p2.getUsername().equals(nuevoUser) && p2 != jugadorActual) {
@@ -588,7 +543,7 @@ public class Menuinicio extends JFrame {
         if (jugadorActual == null) return;
 
         int confirm = JOptionPane.showConfirmDialog(this,
-            "¿Seguro que deseas eliminar tu cuenta? Esta accion no se puede deshacer.",
+            "Seguro que deseas eliminar tu cuenta? Esta accion no se puede deshacer.",
             "Confirmar eliminacion", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
@@ -597,7 +552,6 @@ public class Menuinicio extends JFrame {
             cardLayout.show(panelPrincipal, "INICIO");
         }
     }
-
 
     private void iniciarJuego() {
         JPanel inputPanel = new JPanel(new GridLayout(2, 1, 5, 5));
@@ -619,19 +573,22 @@ public class Menuinicio extends JFrame {
         if (!existeJugador(oponente)) return;
         if (oponente.equals(jugadorActual.getUsername())) return;
 
-     
         Player jugadorOponente = buscarJugador(oponente);
 
-        this.setVisible(false);
+        Component[] components = panelPrincipal.getComponents();
+        for (Component comp : components) {
+            if (comp instanceof BattleShipGUI) {
+                panelPrincipal.remove(comp);
+                break;
+            }
+        }
 
-        BattleShipGUI juego = new BattleShipGUI(
-            jugadorActual, jugadorOponente, dificultad, modoJuego, this
-        );
-        juego.mostrar();
+        BattleShipGUI juego = new BattleShipGUI(this, cardLayout, panelPrincipal,
+            jugadorActual, jugadorOponente, dificultad, modoJuego);
+        panelPrincipal.add(juego, "JUEGO");
+        cardLayout.show(panelPrincipal, "JUEGO");
     }
 
-
- 
     public static ArrayList<Player> getJugadores() {
         return jugadores;
     }
@@ -658,15 +615,6 @@ public class Menuinicio extends JFrame {
             if (p.getUsername().equals(username)) return p;
         }
         return null;
-    }
-
-
-    private int indexOfCard(String nombre) {
-        for (int i = 0; i < panelPrincipal.getComponentCount(); i++) {
-            Component c = panelPrincipal.getComponent(i);
-            if (c.getName() != null && c.getName().equals(nombre)) return i;
-        }
-        return -1;
     }
 
     private JButton crearBoton(String texto, Color color) {
